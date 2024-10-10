@@ -6,20 +6,22 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Serve static files (like index.html, game.html, etc.) from the 'public' folder
+const games = {};
+
+// Serve static files (including CSS, JS, and HTML files)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route for the root URL
+// Serve index.html for the root route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html')); // Send the index.html file
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Handle game routes
+// Serve game.html for any game routes
 app.get('/:gameCode', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'game.html')); // Send the game.html file
+  res.sendFile(path.join(__dirname, 'public', 'game.html'));
 });
 
-// WebSocket logic for real-time chat and game updates
+// WebSocket logic
 io.on('connection', (socket) => {
   socket.on('joinGame', ({ gameCode, username }) => {
     if (!games[gameCode]) {
@@ -37,14 +39,26 @@ io.on('connection', (socket) => {
 
   socket.on('toggleReady', ({ gameCode, username, ready }) => {
     const players = games[gameCode];
-    const player = players.find(p => p.username === username);
-    if (player) {
-      player.ready = ready;
-      io.in(gameCode).emit('playerUpdate', players);
+    
+    // Check if players array exists for the gameCode
+    if (!players) {
+      console.error(`No players found for gameCode: ${gameCode}`);
+      return;
     }
+
+    const player = players.find(p => p.username === username);
+
+    // Check if the player exists in the game
+    if (!player) {
+      console.error(`Player ${username} not found in gameCode: ${gameCode}`);
+      return;
+    }
+
+    player.ready = ready;
+    io.in(gameCode).emit('playerUpdate', players);
   });
 });
 
 server.listen(3000, () => {
-  console.log('Listening on *:3000');
+  console.log('Listening on localhost:3000');
 });

@@ -4,29 +4,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aux Battles</title>
-  <style>
-    /* Add nice styles here for buttons, layout, etc. */
-    body { text-align: center; }
-    button { padding: 10px 20px; margin: 20px; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <h1>Aux Battles</h1>
-  <button onclick="hostGame()">Host a Game</button>
-  <button onclick="joinGame()">Join Game</button>
-  <button>Online Play</button>
-  
+  <div>
+    <h1>Aux Battles</h1>
+    <div class="button-container">
+      <button onclick="hostGame()">Host a Game</button>
+      <button onclick="joinGame()">Join Game</button>
+      <button>Online Play</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2024 Aux Battles
+  </div>
+
   <script>
     function hostGame() {
       const username = prompt("Enter your username:");
       if (username) {
-        // Generate a 4-letter code
         const gameCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-        // Redirect to the game lobby with code in the URL
         window.location.href = `/${gameCode}?host=true&username=${username}`;
       }
     }
-    
+
     function joinGame() {
       const gameCode = prompt("Enter the 4-letter game code:");
       if (gameCode && gameCode.length === 4) {

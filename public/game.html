@@ -4,19 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aux Battles Lobby</title>
-  <style>
-    .chat, .ready-section { border: 1px solid black; padding: 10px; margin: 20px; }
-    .ready-section input[type="checkbox"] { margin-right: 10px; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <h2>Welcome to the game lobby!</h2>
   <div class="chat">
     <h3>Chat</h3>
     <div id="messages"></div>
     <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="sendMessage(event)">
   </div>
-  
+
   <div class="ready-section">
     <h3>Ready?</h3>
     <div id="players"></div>
@@ -28,23 +25,21 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    const socket = io(); // Connect to server via WebSocket
+    const socket = io();
     const gameCode = window.location.pathname.substring(1);
     const username = new URLSearchParams(window.location.search).get('username');
 
     socket.emit('joinGame', { gameCode, username });
 
-    // Listen for chat messages
     socket.on('chatMessage', (message) => {
       const messageElem = document.createElement('div');
       messageElem.textContent = message;
       document.getElementById('messages').appendChild(messageElem);
     });
 
-    // Listen for player updates (e.g., new players joining, ready status changes)
     socket.on('playerUpdate', (players) => {
       const playerList = document.getElementById('players');
-      playerList.innerHTML = ''; // Clear existing
+      playerList.innerHTML = '';
       players.forEach(player => {
         const playerElem = document.createElement('div');
         playerElem.textContent = `${player.username} ${player.ready ? '[Ready]' : ''}`;
@@ -56,7 +51,7 @@
       if (event.key === 'Enter') {
         const chatInput = document.getElementById('chatInput');
         socket.emit('sendMessage', { gameCode, message: `${username}: ${chatInput.value}` });
-        chatInput.value = ''; // Clear input
+        chatInput.value = '';
       }
     }
 
