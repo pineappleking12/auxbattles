@@ -3,62 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aux Battles Lobby</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Aux Battles - Game Lobby</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="chat">
-    <h3>Chat</h3>
-    <div id="messages"></div>
-    <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="sendMessage(event)">
-  </div>
+  <div class="container">
+    <h1>Game Lobby</h1>
+    <div id="roomCodeDisplay">Room Code: <span id="roomCode"></span></div>
+    <button id="leaveBtn">Leave</button>
+    
+    <div class="game-sections">
+      <div id="chatSection">
+        <h2>Chat</h2>
+        <div id="chatBox"></div>
+        <input type="text" id="messageInput" placeholder="Type a message">
+        <button id="sendMessageBtn">Send</button>
+      </div>
 
-  <div class="ready-section">
-    <h3>Ready?</h3>
-    <div id="players"></div>
-    <label>
-      <input type="checkbox" id="readyCheck" onclick="toggleReady()">
-      I'm Ready
-    </label>
+      <div id="readySection">
+        <h2>Players</h2>
+        <ul id="playersList"></ul>
+        <button id="toggleReadyBtn">Toggle Ready</button>
+      </div>
+    </div>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    const gameCode = window.location.pathname.substring(1);
-    const username = new URLSearchParams(window.location.search).get('username');
+    const roomCode = window.location.pathname.split('/')[1];
+    const username = localStorage.getItem('username');
+    
+    // Display room code on page
+    document.getElementById('roomCode').innerText = roomCode;
 
-    socket.emit('joinGame', { gameCode, username });
+    // Join game logic
+    socket.emit('joinGame', { gameCode: roomCode, username });
 
-    socket.on('chatMessage', (message) => {
-      const messageElem = document.createElement('div');
-      messageElem.textContent = message;
-      document.getElementById('messages').appendChild(messageElem);
+    // Handle chat messages
+    document.getElementById('sendMessageBtn').addEventListener('click', () => {
+      const message = document.getElementById('messageInput').value;
+      socket.emit('sendMessage', { gameCode: roomCode, message });
     });
 
+    socket.on('chatMessage', (message) => {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML += `<p>${message}</p>`;
+    });
+
+    // Handle ready state toggle
+    document.getElementById('toggleReadyBtn').addEventListener('click', () => {
+      socket.emit('toggleReady', { gameCode: roomCode, username, ready: true });
+    });
+
+    // Update players list with ready state and host indication
     socket.on('playerUpdate', (players) => {
-      const playerList = document.getElementById('players');
-      playerList.innerHTML = '';
+      const playersList = document.getElementById('playersList');
+      playersList.innerHTML = '';
       players.forEach(player => {
-        const playerElem = document.createElement('div');
-        playerElem.textContent = `${player.username} ${player.ready ? '[Ready]' : ''}`;
-        playerList.appendChild(playerElem);
+        const li = document.createElement('li');
+        li.innerText = `${player.username} ${player.ready ? '(Ready)' : '(Not Ready)'} ${player.isHost ? '(Host)' : ''}`;
+        playersList.appendChild(li);
       });
     });
 
-    function sendMessage(event) {
-      if (event.key === 'Enter') {
-        const chatInput = document.getElementById('chatInput');
-        socket.emit('sendMessage', { gameCode, message: `${username}: ${chatInput.value}` });
-        chatInput.value = '';
-      }
-    }
+    // Leave game logic
+    document.getElementById('leaveBtn').addEventListener('click', () => {
+      socket.emit('leaveGame', { gameCode: roomCode, username });
+      window.location.href = '/';
+    });
 
-    function toggleReady() {
-      const ready = document.getElementById('readyCheck').checked;
-      socket.emit('toggleReady', { gameCode, username, ready });
-    }
+    // Notify when a player leaves
+    socket.on('playerLeft', (username) => {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML += `<p>${username} has left the game.</p>`;
+    });
   </script>
 </body>
 </html>
