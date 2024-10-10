@@ -4,96 +4,113 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aux Battles - Game Lobby</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
   <div class="container">
-    <h1>Game Lobby</h1>
-    
-    <div id="roomCodeDisplay">Room Code: <span id="roomCode"></span></div>
-    
-    <button id="leaveBtn">Leave</button>
+    <div class="main-content">
+      <h1>Aux Battles - Game Lobby</h1>
+      <div id="roomCodeDisplay">Room Code: <span id="roomCode"></span></div>
+      <div id="players" class="ready-section">
+        <h2>Players</h2>
+        <!-- Players will be updated here -->
+      </div>
+      <button id="startGameBtn">Start Game</button>
+      <button id="readyBtn">Ready Up</button>
+      <button id="leaveBtn" onclick="leaveGame()">Leave Game</button>
+    </div>
 
-    <!-- Chat section -->
     <div class="chat">
       <h2>Chat</h2>
       <div id="messages"></div>
-      <input type="text" id="messageInput" placeholder="Type a message and press Enter">
+      <input type="text" id="chatInput" placeholder="Type a message...">
     </div>
-
-
-
-  <!-- Ready section -->
-<div class="ready-section">
-  <h2>Players</h2>
-  <div id="players"></div>
-  <label for="readyCheckbox">
-    <input type="checkbox" id="readyCheckbox"> I'm Ready
-  </label>
-  
-  <!-- Host-only "Start Game" button -->
-  <button id="startGameBtn" style="display:none;">Start Game</button>
-</div>
-
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    const roomCode = window.location.pathname.split('/')[1];
-    const username = localStorage.getItem('username') || prompt('Enter your username'); // prompt if no username is found
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = decodeURIComponent(urlParams.get('username'));
+    const gameCode = window.location.pathname.slice(1);
+    const isHost = urlParams.get('host') === 'true';
 
-    localStorage.setItem('username', username); // save the username
+    // Update room code display
+    document.getElementById('roomCode').innerText = gameCode;
 
-    document.getElementById('roomCode').innerText = roomCode;
+    // Join the game
+    socket.emit('joinGame', { gameCode, username, isHost });
 
-    // Join game logic
-    socket.emit('joinGame', { gameCode: roomCode, username });
+    // Show the "Start Game" button only for the host
+    if (isHost) {
+      document.getElementById('startGameBtn').style.display = 'block';
+      document.getElementById('readyBtn').style.display = 'none'; // Hide the ready button for the host
+    } else {
+      document.getElementById('startGameBtn').style.display = 'none'; // Hide the start button for non-hosts
+    }
 
-    // Handle chat messages
-    document.getElementById('messageInput').addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        const message = event.target.value;
-        if (message.trim() !== '') {
-          socket.emit('sendMessage', { gameCode: roomCode, message: username + ": " + message });
-          event.target.value = ''; // clear the input field
+    // Handle the Ready button for non-hosts
+    let isReady = false;
+    document.getElementById('readyBtn').addEventListener('click', () => {
+      isReady = !isReady; // Toggle ready state
+      socket.emit('toggleReady', { gameCode, username, ready: isReady });
+      document.getElementById('readyBtn').textContent = isReady ? 'Unready' : 'Ready Up'; // Change button text
+    });
+
+    // Start game with countdown when host clicks "Start Game"
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+      socket.emit('startGame', { gameCode });
+
+      let countdown = 3;
+      const countdownInterval = setInterval(() => {
+        if (countdown > 0) {
+          socket.emit('sendMessage', { gameCode, message: `Game starts in ${countdown}...` });
+          countdown--;
+        } else {
+          clearInterval(countdownInterval);
+          socket.emit('sendMessage', { gameCode, message: 'Game started!' });
         }
+      }, 1000);
+    });
+
+    // Handle chat input
+    const chatInput = document.getElementById('chatInput');
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && chatInput.value.trim()) {
+        socket.emit('sendMessage', { gameCode, message: `${username}: ${chatInput.value}` });
+        chatInput.value = '';
       }
     });
 
+    // Listen for messages and player updates
     socket.on('chatMessage', (message) => {
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML += `<p>${message}</p>`;
-      messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto scroll to the latest message
+      const messages = document.getElementById('messages');
+      const messageElement = document.createElement('div');
+      messageElement.textContent = message;
+      messages.appendChild(messageElement);
+      messages.scrollTop = messages.scrollHeight;
     });
 
-    // Handle ready state toggle
-    document.getElementById('readyCheckbox').addEventListener('change', (e) => {
-      const ready = e.target.checked;
-      socket.emit('toggleReady', { gameCode: roomCode, username, ready });
-    });
-
-    // Update players list with ready state and host indication
     socket.on('playerUpdate', (players) => {
       const playersDiv = document.getElementById('players');
-      playersDiv.innerHTML = '';
+      playersDiv.innerHTML = '<h2>Players</h2>';
       players.forEach(player => {
-        const playerDiv = document.createElement('div');
-        playerDiv.innerText = `${player.username} ${player.ready ? '(Ready)' : '(Not Ready)'} ${player.isHost ? '(Host)' : ''}`;
-        playersDiv.appendChild(playerDiv);
+        const playerElement = document.createElement('div');
+        playerElement.textContent = player.username + (player.ready ? ' (Ready)' : '');
+        playersDiv.appendChild(playerElement);
       });
     });
 
-    // Leave game logic
-    document.getElementById('leaveBtn').addEventListener('click', () => {
-      socket.emit('leaveGame', { gameCode: roomCode, username });
+    // Leave the game
+    function leaveGame() {
+      socket.emit('leaveGame', { gameCode, username });
       window.location.href = '/';
-    });
+    }
 
-    // Notify when a player leaves
-    socket.on('playerLeft', (username) => {
-      const messagesDiv = document.getElementById('messages');
-      messagesDiv.innerHTML += `<p>${username} has left the game.</p>`;
-      messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto scroll to the latest message
+    // Handle game start announcement
+    socket.on('gameStarting', () => {
+      // Additional logic when game starts (e.g., redirect)
     });
   </script>
 </body>

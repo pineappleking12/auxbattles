@@ -3,9 +3,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-body {
+  }
+  
+  body {
     font-family: 'Poppins', sans-serif;
     background-color: #1f1f1f;
     color: white;
@@ -14,120 +14,129 @@ body {
     align-items: center;
     height: 100vh;
     text-align: center;
-    padding: 20px;
-}
-
-/* Container Style */
-.container {
-    max-width: 800px;
+    padding: 30px; /* Increased padding for more spacing */
+  }
+  
+  .container {
+    display: flex;
+    max-width: 1100px; /* Increased width */
     width: 100%;
+    background-color: #2b2b2b;
+    padding: 35px; /* Slightly more padding */
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  }
+  
+  .main-content {
+    width: 65%; /* Decreased to 65% for the chat to be wider */
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-/* Game Lobby Title */
-h1 {
-    font-size: 3rem;
-    margin-bottom: 20px;
+    justify-content: space-between; /* Ensures button aligns at the bottom */
+    height: 100%;
+  }
+  
+  h1 {
+    font-size: 2.8rem; /* Increased font size */
     color: #f2a365;
-}
-
-/* Room Code Display */
-#roomCodeDisplay {
-    margin-bottom: 20px;
-    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+  
+  #roomCodeDisplay {
+    font-size: 1.5rem; /* Slightly larger */
     color: #f2a365;
-}
-
-/* Leave Button */
-#leaveBtn {
+    margin-bottom: 25px;
+    margin-top: -15px; /* Moves the room code slightly up */
+  }
+  
+  .ready-section {
+    flex-grow: 1; /* Allows the player section to grow */
+    margin-bottom: 25px;
+    background-color: #2e2e2e;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #f2a365;
+    max-height: 300px; /* Increased max height */
+    overflow-y: auto;
+  }
+  
+  .ready-section h2 {
+    font-size: 1.4rem; /* Slightly larger */
+    color: #f2a365;
+    margin-bottom: 15px;
+  }
+  
+  .ready-section div {
+    font-size: 1.3rem; /* Larger player font size */
+    margin: 7px 0;
+  }
+  
+  /* Button Styles */
+  button {
     background-color: #f2a365;
     border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    font-size: 1rem;
+    border-radius: 12px;
+    padding: 14px 28px; /* Bigger buttons */
+    font-size: 1.3rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
     color: white;
-    margin-bottom: 20px;
-}
-
-#leaveBtn:hover {
-    background-color: #f08a5d;
-}
-
-#leaveBtn:active {
-    transform: scale(0.95);
-}
-
-/* Chat Section */
-.chat {
+    transition: all 0.3s ease;
     width: 100%;
+    margin-bottom: 20px; /* More spacing between buttons */
+  }
+  
+  button:hover {
+    background-color: #f08a5d;
+  }
+  
+  button:active {
+    transform: scale(0.98);
+  }
+  
+  /* Start Game Button */
+  #startGameBtn {
+    display: none;
+  }
+  
+  #leaveBtn {
+    margin-bottom: 0; /* No margin at the bottom */
+    align-self: flex-end; /* Aligns with the bottom of the chat box */
+  }
+  
+  /* Chat Section */
+  .chat {
+    width: 35%; /* Increased width for chat */
     background-color: #2e2e2e;
-    border: 2px solid #f2a365;
+    border: 1px solid #f2a365;
     border-radius: 10px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#messages {
-    height: 150px;
-    overflow-y: scroll;
+    padding: 18px; /* More padding for chat */
+    margin-left: 25px; /* Slightly more space between main content and chat */
+  }
+  
+  .chat h2 {
+    font-size: 1.5rem;
+    color: #f2a365;
+    margin-bottom: 18px; /* More space under chat title */
+  }
+  
+  #messages {
+    height: 450px; /* Matches the height of the ready-section */
+    overflow-y: auto;
     background-color: #444;
     border-radius: 5px;
-    padding: 10px;
-}
-
-input[type="text"] {
+    padding: 15px; /* Slightly more padding */
+    font-size: 1.1rem; /* Larger message text */
+    margin-bottom: 18px;
+    color: #f1f1f1;
+  }
+  
+  input[type="text"] {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 14px; /* Larger input box */
+    border-radius: 6px;
     border: 1px solid #f2a365;
     background-color: #333;
     color: white;
-}
-
-/* Ready Section */
-.ready-section {
-    width: 100%;
-    background-color: #2e2e2e;
-    border: 2px solid #f2a365;
-    border-radius: 10px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#players div {
-    margin-top: 10px;
     font-size: 1.1rem;
-}
-
-/* Host-only Start Game Button */
-#startGameBtn {
-    background-color: #f2a365;
-    border: none;
-    border-radius: 10px;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    color: white;
-    display: none;
-    margin-top: 10px;
-}
-
-#startGameBtn:hover {
-    background-color: #f08a5d;
-}
-
-#startGameBtn:active {
-    transform: scale(0.95);
-}
+  }
+  

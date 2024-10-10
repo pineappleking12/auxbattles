@@ -23,22 +23,23 @@
 
   <script>
     function hostGame() {
-      const username = prompt("Enter your username:");
-      if (username) {
-        const gameCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-        window.location.href = `/${gameCode}?host=true&username=${username}`;
-      }
-    }
+  const username = prompt("Enter your username:");
+  if (username) {
+    const gameCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    window.location.href = `/${gameCode}?host=true&username=${encodeURIComponent(username)}`;
+  }
+}
 
-    function joinGame() {
-      const gameCode = prompt("Enter the 4-letter game code:");
-      if (gameCode && gameCode.length === 4) {
-        const username = prompt("Enter your username:");
-        window.location.href = `/${gameCode}?username=${username}`;
-      } else {
-        alert("Invalid game code.");
-      }
-    }
+function joinGame() {
+  const gameCode = prompt("Enter the 4-letter game code:");
+  if (gameCode && gameCode.length === 4) {
+    const username = prompt("Enter your username:");
+    window.location.href = `/${gameCode}?username=${encodeURIComponent(username)}`;
+  } else {
+    alert("Invalid game code.");
+  }
+}
+
   </script>
 </body>
 </html>
