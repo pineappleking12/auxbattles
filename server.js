@@ -37,6 +37,21 @@ io.on('connection', (socket) => {
     io.in(gameCode).emit('chatMessage', message);
   });
 
+  socket.on('leaveGame', ({ gameCode, username }) => {
+    socket.leave(gameCode);
+    
+    if (games[gameCode]) {
+      games[gameCode] = games[gameCode].filter(player => player.username !== username);
+      io.in(gameCode).emit('playerUpdate', games[gameCode]);
+      io.in(gameCode).emit('chatMessage', `System: ${username} has left the game.`);
+    }
+  });
+  
+  // Handle game start
+  socket.on('startGame', ({ gameCode }) => {
+    io.in(gameCode).emit('gameStarting');
+  });
+  
   socket.on('toggleReady', ({ gameCode, username, ready }) => {
     const players = games[gameCode];
     
