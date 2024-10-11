@@ -105,7 +105,7 @@
   
   /* Chat Section */
   .chat {
-    width: 35%; /* Increased width for chat */
+    width: 45%; /* Increased width for chat */
     background-color: #2e2e2e;
     border: 1px solid #f2a365;
     border-radius: 10px;
@@ -128,6 +128,9 @@
     font-size: 1.1rem; /* Larger message text */
     margin-bottom: 18px;
     color: #f1f1f1;
+    display: flex;
+    flex-direction: column; /* Ensures messages stack vertically */
+    align-items: flex-start;
   }
   
   input[type="text"] {

@@ -1,0 +1,100 @@
+/* General layout */
+body {
+    margin: 0; /* Reset margin */
+    height: 100vh; /* Full height */
+    overflow: hidden; /* Prevent scrolling */
+    font-family: 'Poppins', sans-serif;
+    background-color: #1f1f1f; /* Dark background */
+    color: white; /* White text */
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    height: 100%; /* Full height */
+}
+
+/* Left: Players list */
+.players {
+    width: 20%;
+    background-color: #2e2e2e; /* Dark background for players list */
+    padding: 20px;
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.4); /* Darker shadow */
+    border: 1px solid #f2a365; /* Accent border */
+}
+
+.players h2 {
+    color: #f2a365; /* Accent text */
+    margin-bottom: 10px;
+}
+
+#playersList {
+    display: flex;
+    flex-direction: column;
+    font-size: 1.3rem; /* Increased font size for readability */
+}
+
+/* Center: Prompt Area */
+.prompt-area {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #2e2e2e; /* Dark background for prompt */
+    padding: 20px;
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* Matching shadow */
+}
+
+/* The prompt itself */
+#promptDisplay {
+    font-size: 3rem; /* Make the prompt BIG */
+    font-weight: 700; /* Bold font */
+    color: #f2a365; /* Accent color */
+    text-align: center;
+    padding: 20px; /* Add padding for spacing */
+    background-color: #444; /* Dark background for prompt text */
+    border: 1px solid #f2a365; /* Accent border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Slight shadow for depth */
+    max-width: 80%; /* Limit width to prevent overflow */
+}
+
+/* Right: Chat section */
+.chat {
+    width: 20%;
+    background-color: #2e2e2e; /* Dark background for chat */
+    padding: 20px;
+    box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.4); /* Darker shadow */
+    border: 1px solid #f2a365; /* Accent border */
+    display: flex;
+    flex-direction: column;
+}
+
+.chat h2 {
+    color: #f2a365; /* Accent text color */
+    margin-bottom: 10px;
+}
+
+#messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #444; /* Darker background for chat messages */
+    color: #f1f1f1; /* Lighter text color */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#chatInput {
+    padding: 14px; /* Increased padding for consistency */
+    font-size: 1.1rem; /* Larger input font */
+    width: 100%;
+    background-color: #333; /* Darker input background */
+    border: 1px solid #f2a365; /* Accent border */
+    color: #f1f1f1; /* Light text */
+    box-sizing: border-box;
+    border-radius: 6px; /* Rounded input */
+}

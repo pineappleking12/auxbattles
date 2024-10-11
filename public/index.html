@@ -31,7 +31,7 @@
 }
 
 function joinGame() {
-  const gameCode = prompt("Enter the 4-letter game code:");
+  const gameCode = prompt("Enter the game code:");
   if (gameCode && gameCode.length === 4) {
     const username = prompt("Enter your username:");
     window.location.href = `/${gameCode}?username=${encodeURIComponent(username)}`;
