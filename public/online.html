@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Games</title>
+  <link rel="stylesheet" href="css/online.css">
+</head>
+<body>
+  <div>
+    <h1>Public Rooms</h1>
+    <div id="publicRooms"></div>
+  </div>
+
+  <script>
+    function fetchPublicGames() {
+      fetch('/publicGames')
+        .then(response => {
+          console.log('Response status:', response.status); // Log status
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(games => {
+          console.log('Fetched public games:', games); // Log fetched games
+
+          const roomsContainer = document.getElementById('publicRooms');
+          roomsContainer.innerHTML = ''; // Clear any existing content
+          if (games.length > 0) {
+            games.forEach(game => {
+              const roomElement = document.createElement('div');
+              roomElement.innerHTML = `
+                <p>${game.creatorUsername}'s Room</p>
+                <button onclick="joinGame('${game.code}')">Join Room</button>`;
+              roomsContainer.appendChild(roomElement);
+            });
+          } else {
+            roomsContainer.innerHTML = '<p>No public games available at the moment.</p>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching public games:', error); // Log the error
+          const roomsContainer = document.getElementById('publicRooms');
+          roomsContainer.innerHTML = '<p>Error fetching public games.</p>';
+        });
+    }
+
+    function joinGame(gameCode) {
+      const username = prompt('Enter your username:');
+      if (username) {
+        window.location.href = `/${gameCode}?username=${encodeURIComponent(username)}`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchPublicGames(); // Fetch public games when the page is loaded
+    });
+  </script>
+</body>
+</html>

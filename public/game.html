@@ -83,10 +83,16 @@
       });
     });
 
-    // Ensure all players switch to prompt page when game starts
-    socket.on('gameStarting', ({ prompt }) => {
-      window.location.href = `/prompt.html`;
-    });
+    /// Ensure all players switch to prompt page when game starts
+    // Listen for the gameStarting event to redirect
+   // Ensure all players switch to the prompt page when the game starts
+socket.on('gameStarting', ({ prompt }) => {
+    console.log('Received gameStarting event with prompt:', prompt); // Log the event for debugging
+    window.location.href = `/prompt.html`;  // Redirect to the prompt page
+});
+
+
+
 
     function leaveGame() {
       socket.emit('leaveGame', { gameCode, username });

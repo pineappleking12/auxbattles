@@ -11,9 +11,9 @@
   <div>
     <h1>Aux Battles</h1>
     <div class="button-container">
-      <button onclick="hostGame()">Host a Game</button>
-      <button onclick="joinGame()">Join Game</button>
-      <button>Online Play</button>
+      <button onclick="openModal('hostGameModal')">Host a Game</button>
+      <button onclick="openModal('joinGameModal')">Join Game</button>
+      <button onclick="window.location.href = 'online.html'">Online Play</button>
     </div>
   </div>
 
@@ -21,25 +21,65 @@
     © 2024 Aux Battles
   </div>
 
+  <!-- Host Game Popup Modal -->
+  <div id="hostGameModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('hostGameModal')">&times;</span>
+      <h2>Host a Game</h2>
+      <label for="hostUsername">Username:</label>
+      <input type="text" id="hostUsername" placeholder="Enter your username">
+      <label for="roomType">Room Type:</label>
+      <select id="roomType">
+        <option value="public">Public</option>
+        <option value="private">Private</option>
+      </select>
+      <button onclick="submitHostGame()">Start Game</button>
+    </div>
+  </div>
+
+  <!-- Join Game Popup Modal -->
+  <div id="joinGameModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('joinGameModal')">&times;</span>
+      <h2>Join a Game</h2>
+      <label for="gameCode">Game Code:</label>
+      <input type="text" id="gameCode" placeholder="Enter the game code">
+      <label for="joinUsername">Username:</label>
+      <input type="text" id="joinUsername" placeholder="Enter your username">
+      <button onclick="submitJoinGame()">Join Game</button>
+    </div>
+  </div>
+
   <script>
-    function hostGame() {
-  const username = prompt("Enter your username:");
-  if (username) {
-    const gameCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-    window.location.href = `/${gameCode}?host=true&username=${encodeURIComponent(username)}`;
-  }
-}
+    document.addEventListener('DOMContentLoaded', function() {
+        closeModal('hostGameModal');
+        closeModal('joinGameModal');
+    });
 
-function joinGame() {
-  const gameCode = prompt("Enter the game code:");
-  if (gameCode && gameCode.length === 4) {
-    const username = prompt("Enter your username:");
-    window.location.href = `/${gameCode}?username=${encodeURIComponent(username)}`;
-  } else {
-    alert("Invalid game code.");
-  }
-}
+    function openModal(modalId) {
+      document.getElementById(modalId).style.display = "flex";
+    }
 
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = "none";
+    }
+
+    function submitHostGame() {
+      const username = document.getElementById('hostUsername').value;
+      const roomType = document.getElementById('roomType').value;
+      if (username) {
+        const gameCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+        window.location.href = `/${gameCode}?host=true&username=${encodeURIComponent(username)}&type=${roomType}`;
+      }
+    }
+
+    function submitJoinGame() {
+      const gameCode = document.getElementById('gameCode').value;
+      const username = document.getElementById('joinUsername').value;
+      if (gameCode && username) {
+        window.location.href = `/${gameCode}?username=${encodeURIComponent(username)}`;
+      }
+    }
   </script>
 </body>
 </html>
