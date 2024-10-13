@@ -79,8 +79,8 @@ io.on('connection', (socket) => {
     socket.on('startGame', ({ gameCode }) => {
         const players = games[gameCode].players;
 
-        if (players.length < 4) {
-            io.in(gameCode).emit('chatMessage', 'Cannot start the game. Need at least 4 players to start.');
+        if (players.length < 3) {
+            io.in(gameCode).emit('chatMessage', 'Cannot start the game. Need at least 3 players to start.');
         } else {
             let countdown = 3;
             const countdownInterval = setInterval(() => {

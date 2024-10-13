@@ -40,61 +40,80 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     text-align: center;
-    background-color: #2e2e2e; /* Dark background for prompt */
-    padding: 20px;
-    border-radius: 12px; /* Rounded corners */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4); /* Matching shadow */
+    padding-top: 10vh; /* Push the prompt area down to top 1/4th */
 }
 
-/* The prompt itself */
 #promptDisplay {
-    font-size: 3rem; /* Make the prompt BIG */
+    font-size: 2.5rem; /* Make the prompt large */
     font-weight: 700; /* Bold font */
     color: #f2a365; /* Accent color */
     text-align: center;
-    padding: 20px; /* Add padding for spacing */
+    padding: 20px;
     background-color: #444; /* Dark background for prompt text */
     border: 1px solid #f2a365; /* Accent border */
     border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Slight shadow for depth */
-    max-width: 80%; /* Limit width to prevent overflow */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Slight shadow */
+    max-width: 80%; /* Limit width */
+}
+
+/* Centered text box for response */
+#responseInput {
+    margin-top: 40px;
+    padding: 14px;
+    font-size: 1.2rem;
+    width: 50%; /* Centered and fixed width */
+    background-color: #333;
+    border: 1px solid #f2a365;
+    color: #f1f1f1;
+    border-radius: 6px;
+    text-align: center; /* Center text inside the box */
+    position: absolute;
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Exact centering */
+}
+
+#waitingMessage {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    color: #f2a365;
+    display: none; /* Hidden by default */
 }
 
 /* Right: Chat section */
 .chat {
     width: 20%;
-    background-color: #2e2e2e; /* Dark background for chat */
+    background-color: #2e2e2e;
     padding: 20px;
-    box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.4); /* Darker shadow */
-    border: 1px solid #f2a365; /* Accent border */
+    box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.4);
+    border: 1px solid #f2a365;
     display: flex;
     flex-direction: column;
 }
 
 .chat h2 {
-    color: #f2a365; /* Accent text color */
+    color: #f2a365;
     margin-bottom: 10px;
 }
 
 #messages {
     flex-grow: 1;
     overflow-y: auto;
-    background-color: #444; /* Darker background for chat messages */
-    color: #f1f1f1; /* Lighter text color */
+    background-color: #444;
+    color: #f1f1f1;
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 10px;
 }
 
 #chatInput {
-    padding: 14px; /* Increased padding for consistency */
-    font-size: 1.1rem; /* Larger input font */
+    padding: 14px;
+    font-size: 1.1rem;
     width: 100%;
-    background-color: #333; /* Darker input background */
-    border: 1px solid #f2a365; /* Accent border */
-    color: #f1f1f1; /* Light text */
-    box-sizing: border-box;
-    border-radius: 6px; /* Rounded input */
+    background-color: #333;
+    border: 1px solid #f2a365;
+    color: #f1f1f1;
+    border-radius: 6px;
 }

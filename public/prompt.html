@@ -14,7 +14,13 @@
         </div>
         <div class="prompt-area">
             <!-- Display the prompt here -->
-            <div id="promptDisplay" style="font-size: 48px; font-weight: bold; color: #f2a365;"></div>
+            <div id="promptDisplay"></div>
+            
+            <!-- Response input box -->
+            <input type="text" id="responseInput" placeholder="Type your response...">
+            
+            <!-- Message to show after response is submitted -->
+            <div id="waitingMessage">Waiting for timer to end...</div>
         </div>
         <div class="chat">
             <h2>Chat</h2>
@@ -25,53 +31,65 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = decodeURIComponent(urlParams.get('username'));
-        const gameCode = urlParams.get('gameCode');
+    const socket = io();
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = decodeURIComponent(urlParams.get('username'));
+    const gameCode = urlParams.get('gameCode');
 
-        // Join the game
-        socket.emit('joinGame', { gameCode, username, isHost: false });
+    // List of prompts
+    const prompts = [
+        "Best Frank Ocean song", 
+        "Best Drake song", 
+        "Best KSI song"
+    ];
 
-        // Listen for the gameStarting event to get the prompt
-        // Listen for the gameStarting event to get the prompt
-socket.on('gameStarting', ({ prompt }) => {
-    console.log(`Received prompt: ${prompt}`); // <-- Add this line for debugging
-
-    // Check if prompt is defined
-    if (prompt) {
-        document.getElementById('promptDisplay').textContent = prompt;
-    } else {
-        document.getElementById('promptDisplay').textContent = "No prompt available.";
+    // Function to pick a random prompt
+    function getRandomPrompt() {
+        const randomIndex = Math.floor(Math.random() * prompts.length);
+        return prompts[randomIndex];
     }
-});
 
+    // Display the prompt immediately after loading the page
+    document.addEventListener("DOMContentLoaded", () => {
+        const prompt = getRandomPrompt();  // Get random prompt
+        document.getElementById('promptDisplay').textContent = prompt;  // Display it
+    });
 
-        const chatInput = document.getElementById('chatInput');
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && chatInput.value.trim()) {
-                socket.emit('sendMessage', { gameCode, message: `${username}: ${chatInput.value}` });
-                chatInput.value = '';
-            }
+    // Join the game
+    socket.emit('joinGame', { gameCode, username });
+
+    const responseInput = document.getElementById('responseInput');
+    const waitingMessage = document.getElementById('waitingMessage');
+
+    responseInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && responseInput.value.trim()) {
+            // Emit response
+            socket.emit('submitResponse', { gameCode, response: responseInput.value });
+
+            // Lock the input, keep the value and show the waiting message
+            responseInput.disabled = true;
+            waitingMessage.style.display = 'block';
+        }
+    });
+
+    socket.on('chatMessage', (message) => {
+        const messages = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        messages.appendChild(messageElement);
+        messages.scrollTop = messages.scrollHeight;
+    });
+
+    socket.on('playerUpdate', (players) => {
+        const playersList = document.getElementById('playersList');
+        playersList.innerHTML = '';
+        players.forEach(player => {
+            const playerElement = document.createElement('div');
+            playerElement.textContent = player.username + (player.ready ? ' (Ready)' : '');
+            playersList.appendChild(playerElement);
         });
+    });
+</script>
 
-        socket.on('chatMessage', (message) => {
-            const messages = document.getElementById('messages');
-            const messageElement = document.createElement('div');
-            messageElement.textContent = message;
-            messages.appendChild(messageElement);
-            messages.scrollTop = messages.scrollHeight;
-        });
-
-        socket.on('playerUpdate', (players) => {
-            const playersList = document.getElementById('playersList');
-            playersList.innerHTML = '';
-            players.forEach(player => {
-                const playerElement = document.createElement('div');
-                playerElement.textContent = player.username + (player.ready ? ' (Ready)' : '');
-                playersList.appendChild(playerElement);
-            });
-        });
-    </script>
 </body>
 </html>
