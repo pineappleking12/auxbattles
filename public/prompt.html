@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aux Battles - Prompt</title>
     <link rel="stylesheet" href="css/prompt.css">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
 </head>
 <body>
     <div class="container">
@@ -16,11 +18,17 @@
             <!-- Display the prompt here -->
             <div id="promptDisplay"></div>
             
+            <!-- Timer display -->
+            <div id="timer">15</div>
+
             <!-- Response input box -->
             <input type="text" id="responseInput" placeholder="Type your response...">
             
             <!-- Message to show after response is submitted -->
             <div id="waitingMessage">Waiting for timer to end...</div>
+            
+            <!-- List of player responses -->
+            <div id="responsesDisplay"></div>
         </div>
         <div class="chat">
             <h2>Chat</h2>
@@ -53,6 +61,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         const prompt = getRandomPrompt();  // Get random prompt
         document.getElementById('promptDisplay').textContent = prompt;  // Display it
+        startTimer(15);  // Start the 15-second timer
     });
 
     // Join the game
@@ -60,11 +69,16 @@
 
     const responseInput = document.getElementById('responseInput');
     const waitingMessage = document.getElementById('waitingMessage');
+    const timerDisplay = document.getElementById('timer');
+    const responsesDisplay = document.getElementById('responsesDisplay');
+    
+    let responseSubmitted = false;
 
     responseInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && responseInput.value.trim()) {
             // Emit response
-            socket.emit('submitResponse', { gameCode, response: responseInput.value });
+            socket.emit('submitResponse', { gameCode, username, response: responseInput.value });
+            responseSubmitted = true;
 
             // Lock the input, keep the value and show the waiting message
             responseInput.disabled = true;
@@ -89,7 +103,48 @@
             playersList.appendChild(playerElement);
         });
     });
-</script>
+
+    // Function to update the responses display after the timer ends
+    function displayResponses(responses) {
+        // Hide the prompt, input box, and timer
+        responseInput.style.display = 'none';
+        document.getElementById('promptDisplay').style.display = 'none';
+        timerDisplay.style.display = 'none';
+
+        // Display the responses
+        responsesDisplay.innerHTML = '';  // Clear previous responses
+        responses.forEach(response => {
+            const responseElement = document.createElement('div');
+            responseElement.textContent = `${response.username}: ${response.response}`;
+            responsesDisplay.appendChild(responseElement);
+        });
+
+        // Show the responses in the middle section
+        responsesDisplay.style.display = 'block';
+    }
+
+    socket.on('allResponses', (responses) => {
+        displayResponses(responses);
+    });
+
+    // Function to start the countdown timer
+    function startTimer(seconds) {
+        let timeLeft = seconds;
+        const timerInterval = setInterval(() => {
+            timerDisplay.textContent = timeLeft;
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                socket.emit('endRound', { gameCode });
+            }
+        }, 1000);
+    }
+
+    // Listen for the timer end event to display all responses
+    socket.on('timerEnd', (responses) => {
+        displayResponses(responses);
+    });
+    </script>
 
 </body>
 </html>

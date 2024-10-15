@@ -1,37 +1,37 @@
 /* General layout */
 body {
-    margin: 0; /* Reset margin */
-    height: 100vh; /* Full height */
-    overflow: hidden; /* Prevent scrolling */
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
     font-family: 'Poppins', sans-serif;
-    background-color: #1f1f1f; /* Dark background */
-    color: white; /* White text */
+    background-color: #1f1f1f;
+    color: white;
 }
 
 .container {
     display: flex;
     justify-content: space-between;
-    height: 100%; /* Full height */
+    height: 100%;
 }
 
 /* Left: Players list */
 .players {
     width: 20%;
-    background-color: #2e2e2e; /* Dark background for players list */
+    background-color: #2e2e2e;
     padding: 20px;
-    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.4); /* Darker shadow */
-    border: 1px solid #f2a365; /* Accent border */
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.4);
+    border: 1px solid #f2a365;
 }
 
 .players h2 {
-    color: #f2a365; /* Accent text */
+    color: #f2a365;
     margin-bottom: 10px;
 }
 
 #playersList {
     display: flex;
     flex-direction: column;
-    font-size: 1.3rem; /* Increased font size for readability */
+    font-size: 1.3rem;
 }
 
 /* Center: Prompt Area */
@@ -42,20 +42,49 @@ body {
     align-items: center;
     justify-content: flex-start;
     text-align: center;
-    padding-top: 10vh; /* Push the prompt area down to top 1/4th */
+    padding-top: 10vh;
 }
 
 #promptDisplay {
-    font-size: 2.5rem; /* Make the prompt large */
-    font-weight: 700; /* Bold font */
-    color: #f2a365; /* Accent color */
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #f2a365;
     text-align: center;
     padding: 20px;
-    background-color: #444; /* Dark background for prompt text */
-    border: 1px solid #f2a365; /* Accent border */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Slight shadow */
-    max-width: 80%; /* Limit width */
+    background-color: #444;
+    border: 1px solid #f2a365;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    max-width: 80%;
+}
+
+/* Timer Styles */
+#timer {
+    margin-top: 20px;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #f2a365;
+    background-color: #333;
+    border: 2px solid #f2a365;
+    padding: 10px 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease-in-out;
+}
+
+#timer.warning {
+    color: #e74c3c; /* Red when time is running out */
+    border-color: #e74c3c;
+    animation: shake 0.2s ease-in-out infinite; /* Subtle shake when close to 0 */
+}
+
+/* Shake animation for warning */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
 }
 
 /* Centered text box for response */
@@ -63,23 +92,24 @@ body {
     margin-top: 40px;
     padding: 14px;
     font-size: 1.2rem;
-    width: 50%; /* Centered and fixed width */
+    width: 50%;
     background-color: #333;
     border: 1px solid #f2a365;
     color: #f1f1f1;
     border-radius: 6px;
-    text-align: center; /* Center text inside the box */
+    text-align: center;
     position: absolute;
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Exact centering */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
+/* Waiting message */
 #waitingMessage {
     margin-top: 20px;
     font-size: 1.5rem;
     color: #f2a365;
-    display: none; /* Hidden by default */
+    display: none;
 }
 
 /* Right: Chat section */
@@ -117,3 +147,45 @@ body {
     color: #f1f1f1;
     border-radius: 6px;
 }
+
+/* Styles for displaying answers after timer ends */
+.answers-display {
+    display: none; /* Hidden initially */
+    font-size: 1.8rem;
+    color: #f2a365;
+    margin-top: 20px;
+    width: 80%; /* Similar width to prompt area */
+    background-color: #444;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #f2a365;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.answers-display p {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #333;
+    border-radius: 5px;
+    color: white;
+}
+
+/* When the answers appear, hide the input area */
+#responseInput.hide,
+#promptDisplay.hide,
+#timer.hide {
+    display: none;
+}
+
+/* New styles for centering answers */
+.answers-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+

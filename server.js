@@ -5,6 +5,7 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const axios = require('axios'); // To make HTTP requests
 
 const games = {};
 const prompts = [
@@ -12,6 +13,10 @@ const prompts = [
     "Best Drake song", 
     "Best KSI song"
 ];
+
+const SPOTIFY_CLIENT_ID = 'e13a6cf593714dde85b170a81eccad0f';  // Replace with your Spotify Client ID
+const SPOTIFY_CLIENT_SECRET = '3d403943b2e24d06950cbba74e60a60a';  // Replace with your Spotify Client Secret
+let spotifyAccessToken = '';
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -44,12 +49,32 @@ app.get('/publicGames', (req, res) => {
     }
 });
 
+// Spotify Authentication: Fetch token
+app.get('/spotify-token', async (req, res) => {
+    try {
+        const response = await axios.post('https://accounts.spotify.com/api/token', 
+        'grant_type=client_credentials', 
+        {
+            headers: {
+                'Authorization': 'Basic ' + Buffer.from(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).toString('base64'),
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        
+        spotifyAccessToken = response.data.access_token;
+        res.status(200).json({ token: spotifyAccessToken });
+    } catch (error) {
+        console.error('Error fetching Spotify token:', error);
+        res.status(500).json({ message: 'Error fetching Spotify token' });
+    }
+});
+
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     socket.on('joinGame', ({ gameCode, username, isHost, type }) => {
         if (!games[gameCode]) {
-            games[gameCode] = { players: [], type: type || 'private' };  // Set game type
+            games[gameCode] = { players: [], responses: [], type: type || 'private' };  // Set game type and empty responses array
         }
 
         const playerUsername = isHost ? `${username} [Owner]` : username;
@@ -91,8 +116,20 @@ io.on('connection', (socket) => {
                     clearInterval(countdownInterval);
                     const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
                     io.in(gameCode).emit('gameStarting', { prompt: randomPrompt });
+
+                    // Start the 15-second timer for responses
+                    startPromptTimer(gameCode);
                 }
             }, 1000);
+        }
+    });
+
+    // Collect responses from players
+    socket.on('submitResponse', ({ gameCode, response }) => {
+        const player = games[gameCode].players.find(p => p.id === socket.id);
+        if (player) {
+            games[gameCode].responses.push({ username: player.username, response });
+            console.log(`Response from ${player.username}: ${response}`);
         }
     });
 
@@ -108,6 +145,23 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
     });
+
+    // Function to start the 15-second prompt timer
+    function startPromptTimer(gameCode) {
+        let timer = 15;
+        const timerInterval = setInterval(() => {
+            if (timer > 0) {
+                io.in(gameCode).emit('timerUpdate', timer);
+                timer--;
+            } else {
+                clearInterval(timerInterval);
+
+                // After timer ends, show all responses
+                io.in(gameCode).emit('timerEnd', games[gameCode].responses);
+                games[gameCode].responses = []; // Reset responses for the next round
+            }
+        }, 1000);
+    }
 });
 
 // Start the server
